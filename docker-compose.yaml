@@ -1,0 +1,8 @@
+
+services:
+  be:
+    image: lmao1415/ltw:latest
+    ports:
+      - "8082:8080"
+    volumes:
+      - .env:/var/www/btl-lap-trinh-web/.env
