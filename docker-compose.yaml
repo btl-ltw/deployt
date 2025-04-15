@@ -1,8 +1,48 @@
 
 services:
-  be:
-    image: lmao1415/ltw:latest
+  mysql:
+    image: mysql:latest
+    container_name: mysql_server
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mypassword
+      MYSQL_DATABASE: test
+      MYSQL_PASSWORD: mypassword
     ports:
-      - "8082:8080"
+      - "3306:3306"
+    volumes:
+      - ltw_data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: mypassword
+    ports:
+      - "8001:80"
+
+  be:
+    depends_on:
+      - mysql
+    image: lmao1415/ltw:backend
+    ports:
+      - "8080:8080"
     volumes:
       - .env:/var/www/btl-lap-trinh-web/.env
+
+  fe:
+    depends_on:
+      - be 
+    ports:
+      - 3000:3000
+    image: lmao1415/ltw:front-end
+    environment:
+      - BACK_END_URL=http://localhost:8080
+
+
+volumes:
+  ltw_data:
